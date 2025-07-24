@@ -2,11 +2,19 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8" />
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1" />-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000" />
     <title>论文接受率预测器</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 移动端调试
+        window.addEventListener('error', function(e) {
+            console.error('移动端错误:', e.error);
+        });
+    </script>
 </head>
 <body>
     <div id="root"></div>
