@@ -28,7 +28,11 @@ os.makedirs("nips_history_data", exist_ok=True)  # 历史数据目录
 # 允许跨域访问
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",                    # 本地开发
+        "https://products-silk-chi.vercel.app",     # 🔥 你的Vercel前端URL
+        "https://*.vercel.app",                     # 所有Vercel子域名
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
