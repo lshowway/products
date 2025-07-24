@@ -92,7 +92,7 @@ def download_data_from_google_drive():
         if not os.path.exists(file_path):
             print(f"📥 下载 {file_path}...")
             try:
-                response = requests.get(download_url, timeout=300)  # 5分钟超时
+                response = requests.get(download_url, timeout=600, stream=True)  # 5分钟超时
                 response.raise_for_status()
 
                 # 确保目录存在
@@ -118,6 +118,15 @@ def load_historical_data():
     """加载历史评审数据"""
     global historical_data
     print("📊 开始加载历史数据...")
+    print("🔍 当前工作目录:", os.getcwd())
+    print("🔍 检查文件存在:")
+    for year, file_path in [("2024", ICLR_2024_FILE), ("2025", ICLR_2025_FILE)]:
+        exists = os.path.exists(file_path)
+        if exists:
+            size = os.path.getsize(file_path)
+            print(f"  ✅ {file_path}: {size/1024/1024:.1f}MB")
+        else:
+            print(f"  ❌ {file_path}: 不存在")
 
     for year, file_path in [("2024", ICLR_2024_FILE), ("2025", ICLR_2025_FILE)]:
         if os.path.exists(file_path):

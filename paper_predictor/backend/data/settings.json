@@ -4,14 +4,15 @@
   "contact_phone": "13109973548",
   "score_options": [
     1.0,
-    1.5,
     2.0,
-    2.5,
     3.0,
-    3.5,
     4.0,
-    4.5,
-    5.0
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0
   ],
   "confidence_options": [
     1.0,
@@ -20,7 +21,7 @@
     4.0,
     5.0
   ],
-  "conference": "EMNLP",
+  "conference": "NeurIPS",
   "year": "2025",
   "model": "ensemble_v1",
   "payment_wait_time": 10
