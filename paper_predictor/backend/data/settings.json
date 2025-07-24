@@ -24,5 +24,5 @@
   "conference": "NeurIPS",
   "year": "2025",
   "model": "ensemble_v1",
-  "payment_wait_time": 10
+  "payment_wait_time": 2
 }

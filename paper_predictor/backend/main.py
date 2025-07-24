@@ -243,7 +243,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
 
     # 规则1: 均值 > 6
     if user_avg_score > 6:
-        final_probability = random.uniform(0.85, 0.95)
+        final_probability = random.uniform(0.90, 0.92)
         print(f"✅ 规则1命中: 均值{user_avg_score:.2f} > 6, 概率: {final_probability:.3f}")
     # 规则2: 均值 <= 4
     elif user_avg_score <= 4:
@@ -251,7 +251,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
         print(f"❌ 规则2命中: 均值{user_avg_score:.2f} <= 4, 概率: {final_probability:.3f}")
     # 规则3: 全是正分（>=5）
     elif negative_scores == 0:
-        final_probability = random.uniform(0.85, 0.95)
+        final_probability = random.uniform(0.88, 0.92)
         print(f"✅ 规则3命中: 全是正分, 概率: {final_probability:.3f}")
     # 规则4: 全是负分（<5）
     elif positive_scores == 0:
@@ -259,7 +259,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
         print(f"❌ 规则4命中: 全是负分, 概率: {final_probability:.3f}")
     # 规则5: 负分个数 > 正分个数
     elif negative_scores > positive_scores:
-        final_probability = random.uniform(0.1, 0.35)
+        final_probability = random.uniform(0.2, 0.35)
         print(f"❌ 规则5命中: 负分({negative_scores}) > 正分({positive_scores}), 概率: {final_probability:.3f}")
     # 规则6: 三个或更多负分
     elif negative_scores >= 3:
@@ -267,7 +267,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
         print(f"❌ 规则6命中: {negative_scores}个负分, 概率: {final_probability:.3f}")
     # 规则7: 只有一个负分且均值 > 5
     elif negative_scores == 1 and user_avg_score > 5:
-        final_probability = random.uniform(0.80, 0.90)
+        final_probability = random.uniform(0.86, 0.89)
         print(f"✅ 规则7命中: 1个负分且均值{user_avg_score:.2f} > 5, 概率: {final_probability:.3f}")
     # 规则8: 有两个负分
     elif negative_scores == 2:
