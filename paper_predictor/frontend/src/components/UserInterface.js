@@ -33,6 +33,17 @@ export default function UserInterface() {
     acceptanceRate: 0.25
   });
 
+  // 动态获取API基础URL
+  const getApiBaseUrl = () => {
+    // 如果是本地开发环境
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://127.0.0.1:8000';
+    }
+    // 🔥 请将下面的URL替换为您的Railway后端URL
+    // 格式类似：https://your-app-name-production.up.railway.app
+    return 'https://products-production-48e7.up.railway.app'; // <-- 修改这里
+  };
+
   // 获取后端设置
   useEffect(() => {
     fetchSettings();
@@ -53,14 +64,15 @@ export default function UserInterface() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/settings');
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/settings`);
       if (response.ok) {
         const data = await response.json();
 
         // 转换后端数据格式 (snake_case -> camelCase)
         const convertedSettings = {
           price: data.price || 9.90,
-          qrCodeUrl: data.qr_code_url ? `http://127.0.0.1:8000${data.qr_code_url}` : '',
+          qrCodeUrl: data.qr_code_url ? `${apiUrl}${data.qr_code_url}` : '',
           scoreOptions: data.score_options || [1, 3, 5, 6, 8, 10],
           confidenceOptions: data.confidence_options || [1, 2, 3, 4, 5],
           contactPhone: data.contact_phone || '13109973548',
@@ -177,7 +189,8 @@ export default function UserInterface() {
     if (scoreValues.length === 0) return null;
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/predict', {
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -264,6 +277,14 @@ export default function UserInterface() {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{settings.conference || 'NeurIPS'} 论文接受率预测器</h1>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+            <p className="text-gray-700 mb-2">
+              🎯 <strong>智能预测系统</strong> - 基于历史数据分析，预测您的论文在顶级会议的接受可能性
+            </p>
+            <p className="text-sm text-gray-600">
+              💡 只需输入评审评分，即可获得专业的接受率分析和排名预测
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

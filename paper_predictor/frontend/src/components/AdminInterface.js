@@ -59,6 +59,17 @@ export default function AdminInterface() {
     'gradient_boosting_v1'
   ];
 
+  // 动态获取API基础URL
+  const getApiBaseUrl = () => {
+    // 如果是本地开发环境
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://127.0.0.1:8000';
+    }
+    // 🔥 请将下面的URL替换为您的Railway后端URL
+    // 格式类似：https://your-app-name-production.up.railway.app
+    return 'https://products-production-48e7.up.railway.app'; // <-- 修改这里
+  };
+
   // 加载保存的设置
   useEffect(() => {
     const savedSettings = localStorage.getItem('adminSettings');
@@ -85,7 +96,8 @@ export default function AdminInterface() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/stats');
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/stats`);
       if (response.ok) {
         const data = await response.json();
         setSystemStats(data);
@@ -97,7 +109,8 @@ export default function AdminInterface() {
 
   const fetchDataStatus = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/data-status');
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/data-status`);
       if (response.ok) {
         const data = await response.json();
         setDataStatus(data);
@@ -110,7 +123,8 @@ export default function AdminInterface() {
   // 保存设置到后端和本地存储
   const saveSettingsToBackend = async (newSettings) => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/settings', {
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,9 +142,10 @@ export default function AdminInterface() {
       });
 
       if (response.ok) {
+        console.log('后端保存成功');
         return true;
       } else {
-        console.error('后端保存失败');
+        console.error('后端保存失败，状态码:', response.status);
         return false;
       }
     } catch (error) {
@@ -226,14 +241,15 @@ export default function AdminInterface() {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('http://127.0.0.1:8000/upload-qr', {
+        const apiUrl = getApiBaseUrl();
+        const response = await fetch(`${apiUrl}/upload-qr`, {
           method: 'POST',
           body: formData
         });
 
         if (response.ok) {
           const data = await response.json();
-          handleSettingChange('qrCodeUrl', `http://127.0.0.1:8000${data.qr_code_url}`);
+          handleSettingChange('qrCodeUrl', `${apiUrl}${data.qr_code_url}`);
         } else {
           // 后端失败，使用本地预览
           const url = URL.createObjectURL(file);
@@ -245,6 +261,10 @@ export default function AdminInterface() {
         handleSettingChange('qrCodeUrl', url);
       }
     }
+  };
+
+  const handleGoToUserInterface = () => {
+    window.location.href = '/';
   };
 
   const handleLogout = () => {
@@ -292,12 +312,20 @@ export default function AdminInterface() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">系统管理后台</h1>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-            >
-              退出登录
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={handleGoToUserInterface}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                返回用户界面
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                退出登录
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
