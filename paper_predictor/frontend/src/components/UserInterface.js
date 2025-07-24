@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const API_BASE = process.env.NODE_ENV === 'production'
   ? 'https://products-production-48e7.up.railway.app'  // 稍后替换为实际地址
   : 'http://127.0.0.1:8000';
+console.log('🔍 API_BASE:', API_BASE);  // 🔥 添加调试日志
 
 export default function UserInterface() {
   // 动态评审人数支持
@@ -115,7 +116,7 @@ export default function UserInterface() {
   // 创建支付订单
   const createPaymentOrder = async () => {
     try {
-      const response = await fetch('${API_BASE}/create-payment', {
+      const response = await fetch(`${API_BASE}/create-payment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +196,7 @@ export default function UserInterface() {
     if (scoreValues.length === 0) return null;
 
     try {
-      const response = await fetch('${API_BASE}/predict', {
+      const response = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
