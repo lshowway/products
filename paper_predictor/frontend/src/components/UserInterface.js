@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'https://your-backend-url.railway.app'  // 稍后替换为实际地址
+  ? 'https://products-production-48e7.up.railway.app/'  // 稍后替换为实际地址
   : 'http://127.0.0.1:8000';
 
 export default function UserInterface() {

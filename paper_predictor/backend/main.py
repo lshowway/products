@@ -12,6 +12,7 @@ import time
 import numpy as np
 from datetime import datetime
 import random
+import requests
 
 app = FastAPI(
     title="论文接受率预测API",
@@ -60,9 +61,46 @@ prediction_stats = {
     "avg_prediction_time": 0
 }
 
-# 历史数据文件路径
+# Google Drive下载链接
+ICLR_2024_URL = "https://drive.google.com/uc?export=download&id=1CVsi7YU6rNcrhNqPMrGOWsxqHpsmysH4"
+ICLR_2025_URL = "https://drive.google.com/uc?export=download&id=1NXYIG-UIQUnur24fe36fqaobl722pCr_"
+
+# 本地文件路径
 ICLR_2024_FILE = "nips_history_data/ICLR_2024_formatted.jsonl"
 ICLR_2025_FILE = "nips_history_data/ICLR_2025_formatted.jsonl"
+
+
+def download_data_from_google_drive():
+    """从Google Drive下载数据文件（仅在服务器启动时执行一次）"""
+
+    # Google Drive下载链接
+    files_to_download = {
+        "nips_history_data/ICLR_2024_formatted.jsonl": "https://drive.google.com/uc?export=download&id=1CVsi7YU6rNcrhNqPMrGOWsxqHpsmysH4",
+        "nips_history_data/ICLR_2025_formatted.jsonl": "https://drive.google.com/uc?export=download&id=1NXYIG-UIQUnur24fe36fqaobl722pCr_"
+    }
+
+    print("🌐 检查历史数据文件...")
+
+    for file_path, download_url in files_to_download.items():
+        if not os.path.exists(file_path):
+            print(f"📥 下载 {file_path}...")
+            try:
+                response = requests.get(download_url, timeout=300)  # 5分钟超时
+                response.raise_for_status()
+
+                # 确保目录存在
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+                # 保存文件
+                with open(file_path, 'wb') as f:
+                    f.write(response.content)
+
+                print(f"✅ {file_path} 下载成功 ({len(response.content) / 1024 / 1024:.1f} MB)")
+
+            except Exception as e:
+                print(f"❌ {file_path} 下载失败: {e}")
+        else:
+            print(f"✅ {file_path} 已存在，跳过下载")
 
 # 全局历史数据缓存
 historical_data = {}
@@ -329,6 +367,7 @@ def save_payments():
 # 启动时加载数据
 current_settings = load_settings()
 load_payments()
+download_data_from_google_drive()  # 🔥 添加这行
 load_historical_data()  # 加载历史数据
 
 
