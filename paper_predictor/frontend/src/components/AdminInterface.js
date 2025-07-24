@@ -23,7 +23,7 @@ export default function AdminInterface() {
   // 会议配置映射
   const conferenceConfigs = {
     'NeurIPS': {
-      scoreOptions: '1,2,3,4,5,6,7,8,9,10',
+      scoreOptions: '1,2,3,4,5,6',
       confidenceOptions: '1,2,3,4,5',
       description: 'Neural Information Processing Systems'
     },

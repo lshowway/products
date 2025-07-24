@@ -232,6 +232,19 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
         }
 
     # 计算用户论文的基本统计
+    t =  []
+    for x in target_scores:
+        if x == 3:
+            t.append(5)
+        elif x == 4:
+            t.append(6)
+        elif x == 5:
+            t.append(8)
+        elif x == 6:
+            t.append(10)
+        else:
+            t.append(x)
+    target_scores = t
     user_avg_score = np.mean(target_scores)
     positive_scores = sum(1 for score in target_scores if score >= 5)
     negative_scores = sum(1 for score in target_scores if score < 5)
@@ -303,7 +316,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
                 break  # 因为已经按降序排序，可以提前退出
 
         # 计算在接受论文中的排名
-        rank_in_accepted = 1
+        rank_in_accepted = -1
         for paper in accepted_papers:
             if paper['avg_score'] > user_avg_score:
                 rank_in_accepted += 1
