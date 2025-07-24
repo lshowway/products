@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://products-production-48e7.up.railway.app'  // 需要替换为实际URL
+  : 'http://127.0.0.1:8000';
+
 export default function AdminInterface() {
   const [settings, setSettings] = useState({
     price: 9.90,
