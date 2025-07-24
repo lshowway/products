@@ -255,7 +255,9 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
     final_probability = 0.5  # 默认概率
 
     # 规则1: 均值 > 6
-    if user_avg_score > 3.7:
+    if user_avg_score > 4.6:
+        final_probability = random.uniform(0.94,0.96)
+    elif user_avg_score > 3.7:
         final_probability = random.uniform(0.90, 0.92)
         print(f"✅ 规则1命中: 均值{user_avg_score:.2f} > 6, 概率: {final_probability:.3f}")
     # 规则2: 均值 <= 4
