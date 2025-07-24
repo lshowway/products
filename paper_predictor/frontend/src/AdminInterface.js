@@ -10,6 +10,7 @@ export default function AdminInterface() {
     year: '2025',
     model: 'ensemble_v1',
     contactPhone: '13109973548',
+    paymentWaitTime: 60,
     adminPassword: 'admin123'
   });
 
@@ -22,7 +23,12 @@ export default function AdminInterface() {
   // 会议配置映射
   const conferenceConfigs = {
     'NeurIPS': {
-      scoreOptions: '1,2,3,4,5,6,7,8,9,10',
+      scoreOptions: '1,2,3,4,5,6',
+      confidenceOptions: '1,2,3,4,5',
+      description: 'Neural Information Processing Systems'
+    },
+    'NIPS': {
+      scoreOptions: '1,2,3,4,5,6',
       confidenceOptions: '1,2,3,4,5',
       description: 'Neural Information Processing Systems'
     },
@@ -58,6 +64,17 @@ export default function AdminInterface() {
     'gradient_boosting_v1'
   ];
 
+  // 动态获取API基础URL
+  const getApiBaseUrl = () => {
+    // 如果是本地开发环境
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://127.0.0.1:8000';
+    }
+    // 🔥 请将下面的URL替换为您的Railway后端URL
+    // 格式类似：https://your-app-name-production.up.railway.app
+    return 'https://products-production-48e7.up.railway.app'; // <-- 修改这里
+  };
+
   // 加载保存的设置
   useEffect(() => {
     const savedSettings = localStorage.getItem('adminSettings');
@@ -84,7 +101,8 @@ export default function AdminInterface() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/stats');
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/stats`);
       if (response.ok) {
         const data = await response.json();
         setSystemStats(data);
@@ -96,7 +114,8 @@ export default function AdminInterface() {
 
   const fetchDataStatus = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/data-status');
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/data-status`);
       if (response.ok) {
         const data = await response.json();
         setDataStatus(data);
@@ -109,26 +128,29 @@ export default function AdminInterface() {
   // 保存设置到后端和本地存储
   const saveSettingsToBackend = async (newSettings) => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/settings', {
+      const apiUrl = getApiBaseUrl();
+      const response = await fetch(`${apiUrl}/settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          price: newSettings.price,
-          contact_phone: newSettings.contactPhone,
-          score_options: newSettings.scoreOptions,
-          confidence_options: newSettings.confidenceOptions,
-          conference: newSettings.conference,
-          year: newSettings.year,
-          model: newSettings.model
+          price: Number(newSettings.price),
+          contact_phone: String(newSettings.contactPhone),
+          score_options: String(newSettings.scoreOptions).trim(),
+          confidence_options: String(newSettings.confidenceOptions).trim(),
+          conference: String(newSettings.conference || 'ICLR'),
+          year: String(newSettings.year || '2024'),
+          model: String(newSettings.model || 'ensemble_v1'),
+          payment_wait_time: Number(newSettings.paymentWaitTime) || 60
         })
       });
 
       if (response.ok) {
+        console.log('后端保存成功');
         return true;
       } else {
-        console.error('后端保存失败');
+        console.error('后端保存失败，状态码:', response.status);
         return false;
       }
     } catch (error) {
@@ -182,26 +204,6 @@ export default function AdminInterface() {
     }
   };
 
-  // 重置为会议默认配置
-  const resetToDefaultConfig = () => {
-    const config = conferenceConfigs[settings.conference];
-    if (config) {
-      const confirmed = window.confirm(
-        `确定要重置为 ${settings.conference} 的默认配置吗？\n\n` +
-        `评分选项将设为: ${config.scoreOptions}\n` +
-        `自信心选项将设为: ${config.confidenceOptions}`
-      );
-
-      if (confirmed) {
-        setSettings(prev => ({
-          ...prev,
-          scoreOptions: config.scoreOptions,
-          confidenceOptions: config.confidenceOptions
-        }));
-      }
-    }
-  };
-
   const handleSave = async () => {
     setSaveMessage('保存中...');
 
@@ -244,14 +246,15 @@ export default function AdminInterface() {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('http://127.0.0.1:8000/upload-qr', {
+        const apiUrl = getApiBaseUrl();
+        const response = await fetch(`${apiUrl}/upload-qr`, {
           method: 'POST',
           body: formData
         });
 
         if (response.ok) {
           const data = await response.json();
-          handleSettingChange('qrCodeUrl', `http://127.0.0.1:8000${data.qr_code_url}`);
+          handleSettingChange('qrCodeUrl', `${apiUrl}${data.qr_code_url}`);
         } else {
           // 后端失败，使用本地预览
           const url = URL.createObjectURL(file);
@@ -263,6 +266,10 @@ export default function AdminInterface() {
         handleSettingChange('qrCodeUrl', url);
       }
     }
+  };
+
+  const handleGoToUserInterface = () => {
+    window.location.href = '/';
   };
 
   const handleLogout = () => {
@@ -311,12 +318,12 @@ export default function AdminInterface() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">系统管理后台</h1>
             <div className="flex space-x-3">
-              <a
-                href="/"
+              <button
+                onClick={handleGoToUserInterface}
                 className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
               >
-                用户界面
-              </a>
+                返回用户界面
+              </button>
               <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
@@ -326,24 +333,9 @@ export default function AdminInterface() {
             </div>
           </div>
 
-          {saveMessage && (
-            <div className={`mb-6 p-4 rounded-lg ${
-              saveMessage.includes('✅') ? 'bg-green-50 text-green-800 border border-green-200' :
-              saveMessage.includes('⚠️') ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
-              'bg-blue-50 text-blue-800 border border-blue-200'
-            }`}>
-              {saveMessage}
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">基础设置</h2>
-
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h3 className="font-semibold text-red-800 mb-2">⚠️ 支付金额验证</h3>
-                <p className="text-sm text-red-700">用户支付金额必须大于等于设置价格，否则订单创建失败</p>
-              </div>
 
               <div>
                 <label className="block text-gray-700 font-medium mb-2">预测价格 (¥)</label>
@@ -356,6 +348,19 @@ export default function AdminInterface() {
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">用户支付此价格后可查看预测结果</p>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">支付等待时间 (秒)</label>
+                <input
+                  type="number"
+                  min="10"
+                  max="300"
+                  value={settings.paymentWaitTime}
+                  onChange={(e) => handleSettingChange('paymentWaitTime', Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">用户在支付页面需要等待的时间</p>
               </div>
 
               <div>
@@ -401,30 +406,10 @@ export default function AdminInterface() {
                   ))}
                 </select>
               </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">管理员密码</label>
-                <input
-                  type="password"
-                  value={settings.adminPassword}
-                  onChange={(e) => handleSettingChange('adminPassword', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                  placeholder="修改管理员密码"
-                />
-                <p className="text-xs text-gray-500 mt-1">修改后下次登录需要使用新密码</p>
-              </div>
             </div>
 
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">评分设置</h2>
-                <button
-                  onClick={resetToDefaultConfig}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
-                >
-                  重置为会议默认
-                </button>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">评分设置</h2>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-800 mb-2">📝 当前会议配置</h3>
@@ -435,7 +420,7 @@ export default function AdminInterface() {
                   <div>默认评分: {conferenceConfigs[settings.conference]?.scoreOptions}</div>
                   <div>默认自信心: {conferenceConfigs[settings.conference]?.confidenceOptions}</div>
                   <div className="text-blue-500 mt-2">
-                    💡 切换会议时会询问是否使用默认配置，或点击"重置为会议默认"按钮
+                    💡 切换会议时会询问是否使用默认配置
                   </div>
                 </div>
               </div>
@@ -632,17 +617,26 @@ export default function AdminInterface() {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center flex items-center justify-center gap-4">
             <button
               onClick={handleSave}
               className="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors text-lg font-semibold"
             >
               保存所有设置
             </button>
-            <p className="text-xs text-gray-500 mt-2">
-              设置将保存到本地和服务器，用户界面会立即更新
-            </p>
+            {saveMessage && (
+              <div className={`px-4 py-2 rounded-lg ${
+                saveMessage.includes('✅') ? 'bg-green-50 text-green-800 border border-green-200' :
+                saveMessage.includes('⚠️') ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                'bg-blue-50 text-blue-800 border border-blue-200'
+              }`}>
+                {saveMessage}
+              </div>
+            )}
           </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            设置将保存到本地和服务器，用户界面会立即更新
+          </p>
         </div>
       </div>
     </div>

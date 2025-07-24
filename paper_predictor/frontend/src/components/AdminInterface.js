@@ -27,6 +27,11 @@ export default function AdminInterface() {
       confidenceOptions: '1,2,3,4,5',
       description: 'Neural Information Processing Systems'
     },
+    'NIPS': {
+      scoreOptions: '1,2,3,4,5,6',
+      confidenceOptions: '1,2,3,4,5',
+      description: 'Neural Information Processing Systems'
+    },
     'ICLR': {
       scoreOptions: '1,3,5,6,8,10',
       confidenceOptions: '1,2,3,4,5',
