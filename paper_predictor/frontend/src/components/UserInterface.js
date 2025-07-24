@@ -40,7 +40,6 @@ export default function UserInterface() {
 
   const fetchSettings = async () => {
     try {
-      // const response = await fetch('http://127.0.0.1:8000/settings');
       const response = await fetch(`${API_BASE}/settings`);
       if (response.ok) {
         const data = await response.json();
@@ -49,7 +48,7 @@ export default function UserInterface() {
         const convertedSettings = {
           price: data.price || 9.90,
           qrCodeUrl: data.qr_code_url ? `http://127.0.0.1:8000${data.qr_code_url}` : '',
-          scoreOptions: data.score_options || [1, 3, 5, 6, 8, 10],
+          scoreOptions: data.score_options || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           confidenceOptions: data.confidence_options || [1, 2, 3, 4, 5],
           contactPhone: data.contact_phone || '13109973548',
           conference: data.conference || 'NeurIPS',
