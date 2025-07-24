@@ -92,7 +92,10 @@ def download_data_from_google_drive():
         if not os.path.exists(file_path):
             print(f"📥 下载 {file_path}...")
             try:
-                response = requests.get(download_url, timeout=600, stream=True)  # 5分钟超时
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+                response = requests.get(download_url, timeout=600, stream=True, headers=headers, allow_redirects=True)
                 response.raise_for_status()
 
                 # 确保目录存在
