@@ -1,7 +1,6 @@
 /.venv/
 /paper_predictor/frontend/node_modules
-/paper_predictor/backend/nips_history_data/ICLR_2024_formatted.jsonl
-/paper_predictor/backend/nips_history_data/ICLR_2025_formatted.jsonl
+
 __pycache__/
 *.pyc
 # Python
@@ -27,7 +26,9 @@ yarn-error.log*
 *.jsonl
 *.csv
 *.xlsx
-nips_history_data/
+# nips_history_data/
+#/paper_predictor/backend/nips_history_data/ICLR_2024_formatted.jsonl
+#/paper_predictor/backend/nips_history_data/ICLR_2025_formatted.jsonl
 
 # IDE
 .vscode/
