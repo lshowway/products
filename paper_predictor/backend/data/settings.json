@@ -1,6 +1,6 @@
 {
   "price": 9.9,
-  "qr_code_url": "/uploads/qr_codes/qr_1753324209.png",
+  "qr_code_url": "/uploads/qr_codes/qr_1753342880.png",
   "contact_phone": "13109973548",
   "score_options": [
     1,
@@ -23,5 +23,6 @@
   ],
   "conference": "NeurIPS",
   "year": "2025",
-  "model": "ensemble_v1"
+  "model": "ensemble_v1",
+  "payment_wait_time": 10
 }

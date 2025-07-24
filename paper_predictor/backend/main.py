@@ -55,7 +55,8 @@ DEFAULT_SETTINGS = {
     "score_options": [1, 3, 5, 6, 8, 10],
     "confidence_options": [1, 2, 3, 4, 5],
     "conference": "ICLR",
-    "year": "2024"
+    "year": "2024",
+    "payment_wait_time": 60  # 新增：支付等待时间
 }
 
 # 支付订单存储
@@ -406,6 +407,7 @@ class SettingsUpdate(BaseModel):
     confidence_options: str
     conference: Optional[str] = "ICLR"
     year: Optional[str] = "2024"
+    payment_wait_time: Optional[int] = 60  # 新增：支付等待时间
 
 
 class PaymentOrder(BaseModel):
@@ -458,7 +460,8 @@ async def update_settings(new_settings: SettingsUpdate):
             "score_options": score_options,
             "confidence_options": confidence_options,
             "conference": new_settings.conference or current_settings.get("conference", "ICLR"),
-            "year": new_settings.year or current_settings.get("year", "2024")
+            "year": new_settings.year or current_settings.get("year", "2024"),
+            "payment_wait_time": new_settings.payment_wait_time or current_settings.get("payment_wait_time", 60)
         })
 
         # 保存到文件
@@ -507,14 +510,6 @@ async def upload_qr_code(file: UploadFile = File(...)):
 async def create_payment_order(order: PaymentOrder):
     """创建支付订单"""
     try:
-        # 验证支付金额
-        min_amount = current_settings.get("price", 0.2)
-        if order.amount < min_amount:
-            raise HTTPException(
-                status_code=400,
-                detail=f"支付金额不能少于 ¥{min_amount}"
-            )
-
         order_id = str(uuid.uuid4())
         payment_data = {
             "orderId": order_id,
@@ -702,6 +697,7 @@ if __name__ == "__main__":
     print("  - 历史数据支持排名计算")
     print("  - 详细的调试日志")
     print("  - 修复了CORS和移动端适配")
+    print("  - 可配置支付等待时间")
     print("")
     print("🌐 访问地址:")
     print(f"  API服务: http://0.0.0.0:{port}")

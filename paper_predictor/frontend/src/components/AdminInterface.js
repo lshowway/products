@@ -10,6 +10,7 @@ export default function AdminInterface() {
     year: '2025',
     model: 'ensemble_v1',
     contactPhone: '13109973548',
+    paymentWaitTime: 60,
     adminPassword: 'admin123'
   });
 
@@ -121,7 +122,8 @@ export default function AdminInterface() {
           confidence_options: newSettings.confidenceOptions,
           conference: newSettings.conference,
           year: newSettings.year,
-          model: newSettings.model
+          model: newSettings.model,
+          payment_wait_time: newSettings.paymentWaitTime
         })
       });
 
@@ -177,26 +179,6 @@ export default function AdminInterface() {
         setSettings(prev => ({
           ...prev,
           conference: newConference
-        }));
-      }
-    }
-  };
-
-  // 重置为会议默认配置
-  const resetToDefaultConfig = () => {
-    const config = conferenceConfigs[settings.conference];
-    if (config) {
-      const confirmed = window.confirm(
-        `确定要重置为 ${settings.conference} 的默认配置吗？\n\n` +
-        `评分选项将设为: ${config.scoreOptions}\n` +
-        `自信心选项将设为: ${config.confidenceOptions}`
-      );
-
-      if (confirmed) {
-        setSettings(prev => ({
-          ...prev,
-          scoreOptions: config.scoreOptions,
-          confidenceOptions: config.confidenceOptions
         }));
       }
     }
@@ -310,40 +292,17 @@ export default function AdminInterface() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-800">系统管理后台</h1>
-            <div className="flex space-x-3">
-              <a
-                href="/"
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                用户界面
-              </a>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                退出登录
-              </button>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            >
+              退出登录
+            </button>
           </div>
-
-          {saveMessage && (
-            <div className={`mb-6 p-4 rounded-lg ${
-              saveMessage.includes('✅') ? 'bg-green-50 text-green-800 border border-green-200' :
-              saveMessage.includes('⚠️') ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
-              'bg-blue-50 text-blue-800 border border-blue-200'
-            }`}>
-              {saveMessage}
-            </div>
-          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">基础设置</h2>
-
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h3 className="font-semibold text-red-800 mb-2">⚠️ 支付金额验证</h3>
-                <p className="text-sm text-red-700">用户支付金额必须大于等于设置价格，否则订单创建失败</p>
-              </div>
 
               <div>
                 <label className="block text-gray-700 font-medium mb-2">预测价格 (¥)</label>
@@ -356,6 +315,19 @@ export default function AdminInterface() {
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">用户支付此价格后可查看预测结果</p>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">支付等待时间 (秒)</label>
+                <input
+                  type="number"
+                  min="10"
+                  max="300"
+                  value={settings.paymentWaitTime}
+                  onChange={(e) => handleSettingChange('paymentWaitTime', Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">用户在支付页面需要等待的时间</p>
               </div>
 
               <div>
@@ -401,30 +373,10 @@ export default function AdminInterface() {
                   ))}
                 </select>
               </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">管理员密码</label>
-                <input
-                  type="password"
-                  value={settings.adminPassword}
-                  onChange={(e) => handleSettingChange('adminPassword', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                  placeholder="修改管理员密码"
-                />
-                <p className="text-xs text-gray-500 mt-1">修改后下次登录需要使用新密码</p>
-              </div>
             </div>
 
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">评分设置</h2>
-                <button
-                  onClick={resetToDefaultConfig}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition-colors"
-                >
-                  重置为会议默认
-                </button>
-              </div>
+              <h2 className="text-xl font-semibold text-gray-800 border-b pb-2">评分设置</h2>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-800 mb-2">📝 当前会议配置</h3>
@@ -435,7 +387,7 @@ export default function AdminInterface() {
                   <div>默认评分: {conferenceConfigs[settings.conference]?.scoreOptions}</div>
                   <div>默认自信心: {conferenceConfigs[settings.conference]?.confidenceOptions}</div>
                   <div className="text-blue-500 mt-2">
-                    💡 切换会议时会询问是否使用默认配置，或点击"重置为会议默认"按钮
+                    💡 切换会议时会询问是否使用默认配置
                   </div>
                 </div>
               </div>
@@ -632,17 +584,26 @@ export default function AdminInterface() {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center flex items-center justify-center gap-4">
             <button
               onClick={handleSave}
               className="bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transition-colors text-lg font-semibold"
             >
               保存所有设置
             </button>
-            <p className="text-xs text-gray-500 mt-2">
-              设置将保存到本地和服务器，用户界面会立即更新
-            </p>
+            {saveMessage && (
+              <div className={`px-4 py-2 rounded-lg ${
+                saveMessage.includes('✅') ? 'bg-green-50 text-green-800 border border-green-200' :
+                saveMessage.includes('⚠️') ? 'bg-yellow-50 text-yellow-800 border border-yellow-200' :
+                'bg-blue-50 text-blue-800 border border-blue-200'
+              }`}>
+                {saveMessage}
+              </div>
+            )}
           </div>
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            设置将保存到本地和服务器，用户界面会立即更新
+          </p>
         </div>
       </div>
     </div>
