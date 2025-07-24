@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'https://products-production-48e7.up.railway.app'  // 需要替换为实际URL
-  : 'http://127.0.0.1:8000';
-
 export default function AdminInterface() {
   const [settings, setSettings] = useState({
     price: 9.90,
@@ -88,7 +84,7 @@ export default function AdminInterface() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('${API_BASE}/stats');
+      const response = await fetch('http://127.0.0.1:8000/stats');
       if (response.ok) {
         const data = await response.json();
         setSystemStats(data);
@@ -100,7 +96,7 @@ export default function AdminInterface() {
 
   const fetchDataStatus = async () => {
     try {
-      const response = await fetch('${API_BASE}/data-status');
+      const response = await fetch('http://127.0.0.1:8000/data-status');
       if (response.ok) {
         const data = await response.json();
         setDataStatus(data);
@@ -113,7 +109,7 @@ export default function AdminInterface() {
   // 保存设置到后端和本地存储
   const saveSettingsToBackend = async (newSettings) => {
     try {
-      const response = await fetch('${API_BASE}/settings', {
+      const response = await fetch('http://127.0.0.1:8000/settings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -248,7 +244,7 @@ export default function AdminInterface() {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch('${API_BASE}/upload-qr', {
+        const response = await fetch('http://127.0.0.1:8000/upload-qr', {
           method: 'POST',
           body: formData
         });

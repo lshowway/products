@@ -21,55 +21,32 @@ export default function UserInterface() {
     contactPhone: '13109973548'
   });
 
-  // 修复：从后端获取真实的历史数据统计
+  // 历史数据统计
   const [historicalStats, setHistoricalStats] = useState({
     totalPapers: 12000,
     acceptedPapers: 3000,
     acceptanceRate: 0.25
   });
 
-  // 获取API基础URL
-  const getApiBaseUrl = () => {
-    // 部署环境检测
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://127.0.0.1:8000';
-    }
-    // 生产环境使用相对路径或环境变量
-    return process.env.REACT_APP_API_URL || window.location.origin;
-  };
-
-  const API_BASE_URL = getApiBaseUrl();
-
-  // 修复1：定期获取设置和数据状态
+  // 获取后端设置
   useEffect(() => {
     fetchSettings();
-    fetchDataStatus();
-
-    // 每30秒检查一次设置更新
-    const settingsInterval = setInterval(fetchSettings, 30000);
-    // 每60秒检查一次数据状态
-    const dataInterval = setInterval(fetchDataStatus, 60000);
-
-    return () => {
-      clearInterval(settingsInterval);
-      clearInterval(dataInterval);
-    };
   }, []);
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/settings`);
+      const response = await fetch('http://127.0.0.1:8000/settings');
       if (response.ok) {
         const data = await response.json();
 
         // 转换后端数据格式 (snake_case -> camelCase)
         const convertedSettings = {
           price: data.price || 9.90,
-          qrCodeUrl: data.qr_code_url ? `${API_BASE_URL}${data.qr_code_url}` : '',
+          qrCodeUrl: data.qr_code_url ? `http://127.0.0.1:8000${data.qr_code_url}` : '',
           scoreOptions: data.score_options || [1, 3, 5, 6, 8, 10],
           confidenceOptions: data.confidence_options || [1, 2, 3, 4, 5],
           contactPhone: data.contact_phone || '13109973548',
-          conference: data.conference || 'ICLR',
+          conference: data.conference || 'NeurIPS',
           year: data.year || '2024',
           model: data.model || 'ensemble_v1'
         };
@@ -78,39 +55,6 @@ export default function UserInterface() {
       }
     } catch (error) {
       console.log('无法连接后端，使用默认设置');
-    }
-  };
-
-  // 修复2：获取真实的数据状态和统计
-  const fetchDataStatus = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/data-status`);
-      if (response.ok) {
-        const data = await response.json();
-
-        // 从后端数据中提取统计信息
-        if (data.data_details) {
-          let totalPapers = 0;
-          let acceptedPapers = 0;
-
-          // 使用最新年份的数据
-          const years = Object.keys(data.data_details).sort().reverse();
-          if (years.length > 0) {
-            const latestYear = years[0];
-            const latestData = data.data_details[latestYear];
-            totalPapers = latestData.total_papers;
-            acceptedPapers = latestData.accepted_papers;
-          }
-
-          setHistoricalStats({
-            totalPapers: totalPapers || 12000,
-            acceptedPapers: acceptedPapers || 3000,
-            acceptanceRate: totalPapers ? acceptedPapers / totalPapers : 0.25
-          });
-        }
-      }
-    } catch (error) {
-      console.log('无法获取数据状态，使用默认值');
     }
   };
 
@@ -155,7 +99,7 @@ export default function UserInterface() {
   // 支付状态检查
   const checkPaymentStatus = async (orderId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/check-payment/${orderId}`);
+      const response = await fetch(`http://127.0.0.1:8000/check-payment/${orderId}`);
       const data = await response.json();
       return data.status;
     } catch (error) {
@@ -166,7 +110,7 @@ export default function UserInterface() {
   // 创建支付订单
   const createPaymentOrder = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/create-payment`, {
+      const response = await fetch('http://127.0.0.1:8000/create-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -246,7 +190,7 @@ export default function UserInterface() {
     if (scoreValues.length === 0) return null;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/predict`, {
+      const response = await fetch('http://127.0.0.1:8000/predict', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -364,21 +308,21 @@ export default function UserInterface() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8">
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2">{settings.conference || 'ICLR'} 论文接受率预测器</h1>
-          <p className="text-sm sm:text-base text-gray-600">基于{settings.conference || 'ICLR'}历史数据，预测您的论文接受可能性</p>
+    <div className="max-w-6xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">{settings.conference || 'ICLR'} 论文接受率预测器</h1>
+          <p className="text-gray-600">基于{settings.conference || 'ICLR'}历史数据，预测您的论文接受可能性</p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-4">
-            <p className="text-xs sm:text-sm text-yellow-800">💡 预测结果仅供参考，基于真实评审数据训练</p>
+            <p className="text-sm text-yellow-800">💡 预测结果仅供参考，基于真实评审数据训练</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          <div className="space-y-4 sm:space-y-6">
-            <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-2 sm:space-y-0">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{settings.conference || 'ICLR'} 审稿人分数</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-gray-800">{settings.conference || 'ICLR'} 审稿人分数</h3>
                 <div className="flex space-x-2">
                   <button
                     onClick={removeReviewer}
@@ -399,7 +343,7 @@ export default function UserInterface() {
               </div>
 
               {Array.from({length: reviewerCount}, (_, i) => i + 1).map(reviewerIndex => (
-                <div key={reviewerIndex} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 p-3 sm:p-4 bg-white rounded-lg border">
+                <div key={reviewerIndex} className="grid grid-cols-2 gap-4 mb-4 p-4 bg-white rounded-lg border">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">评审 {reviewerIndex} 评分</label>
                     <select
@@ -432,7 +376,7 @@ export default function UserInterface() {
               {hasScores && (
                 <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h4 className="text-sm font-semibold text-blue-800 mb-3">实时统计</h4>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3 text-sm">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-white rounded p-2">
                       <span className="text-gray-600">评审均分:</span>
                       <span className="font-bold text-blue-600 ml-2">{stats.average}</span>
@@ -471,24 +415,24 @@ export default function UserInterface() {
             </button>
           </div>
 
-          <div className="space-y-4 sm:space-y-6">
+          <div className="space-y-6">
             {showPayment && (
-              <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 sm:p-6 text-center">
-                <div className="bg-green-500 text-white p-4 rounded-t-lg -mx-4 sm:-mx-6 -mt-4 sm:-mt-6 mb-4 sm:mb-6">
-                  <h3 className="text-lg sm:text-xl font-bold">微信扫码支付</h3>
+              <div className="bg-green-50 border-2 border-green-400 rounded-lg p-6 text-center">
+                <div className="bg-green-500 text-white p-4 rounded-t-lg -mx-6 -mt-6 mb-6">
+                  <h3 className="text-xl font-bold">微信扫码支付</h3>
                 </div>
 
-                <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg inline-block mb-4">
+                <div className="bg-white p-6 rounded-lg shadow-lg inline-block mb-4">
                   {settings.qrCodeUrl ? (
                     <img
                       src={settings.qrCodeUrl}
                       alt="支付二维码"
-                      className="w-40 h-40 sm:w-48 sm:h-48 object-contain border-2 border-gray-300 rounded-lg mb-4"
+                      className="w-48 h-48 object-contain border-2 border-gray-300 rounded-lg mb-4"
                     />
                   ) : (
-                    <div className="w-40 h-40 sm:w-48 sm:h-48 bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center mb-4">
+                    <div className="w-48 h-48 bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center mb-4">
                       <div className="text-center">
-                        <div className="text-3xl sm:text-4xl mb-2">📱</div>
+                        <div className="text-4xl mb-2">📱</div>
                         <div className="text-sm text-gray-600">微信二维码</div>
                         <div className="text-xs text-gray-500 mt-1">管理员未上传</div>
                       </div>
@@ -504,7 +448,7 @@ export default function UserInterface() {
                   </div>
                 </div>
 
-                <div className="text-xl sm:text-2xl font-bold text-green-600 mb-4">¥{settings.price}</div>
+                <div className="text-2xl font-bold text-green-600 mb-4">¥{settings.price}</div>
                 <div className="text-sm text-yellow-600 mb-4">
                   ⚠️ 请确认支付金额不少于 ¥{settings.price}
                 </div>
@@ -516,14 +460,14 @@ export default function UserInterface() {
                     <p className="text-sm text-gray-600 mt-2">等待支付确认...</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
-                    <button onClick={handlePayment} className="px-4 sm:px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                  <>
+                    <button onClick={handlePayment} className="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors mr-4">
                       确认支付
                     </button>
-                    <button onClick={mockPaymentSuccess} className="px-4 sm:px-6 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors">
+                    <button onClick={mockPaymentSuccess} className="px-6 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors">
                       模拟支付成功
                     </button>
-                  </div>
+                  </>
                 )}
                 <p className="text-xs text-green-600 mt-3">支付完成后页面将自动显示结果</p>
               </div>
@@ -531,49 +475,49 @@ export default function UserInterface() {
 
             {prediction && (
               <>
-                <div className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-300 rounded-xl p-6 sm:p-8 text-center shadow-lg">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">接受可能性为：</h2>
-                  <div className="text-4xl sm:text-6xl font-bold text-green-600 mb-4">
+                <div className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-300 rounded-xl p-8 text-center shadow-lg">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">接受可能性为：</h2>
+                  <div className="text-6xl font-bold text-green-600 mb-4">
                     {(prediction.probability * 100).toFixed(1)}%
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                  <div className="grid grid-cols-3 gap-4 mt-6">
                     <div className="bg-white rounded-lg p-3 shadow">
                       <div className="text-sm font-medium text-gray-600">平均评分</div>
-                      <div className="text-lg sm:text-xl font-bold text-blue-600">
+                      <div className="text-xl font-bold text-blue-600">
                         {prediction.avgScore ? prediction.avgScore.toFixed(1) : '--'}
                       </div>
                     </div>
                     <div className="bg-white rounded-lg p-3 shadow">
                       <div className="text-sm font-medium text-gray-600">最低评分</div>
-                      <div className="text-lg sm:text-xl font-bold text-red-600">
+                      <div className="text-xl font-bold text-red-600">
                         {prediction.minScore || '--'}
                       </div>
                     </div>
                     <div className="bg-white rounded-lg p-3 shadow">
                       <div className="text-sm font-medium text-gray-600">预测置信度</div>
-                      <div className="text-lg sm:text-xl font-bold text-purple-600">高</div>
+                      <div className="text-xl font-bold text-purple-600">高</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 sm:p-6 border shadow">
+                <div className="bg-white rounded-lg p-6 border shadow">
                   <h3 className="text-lg font-semibold mb-4 text-gray-800">论文位次分析</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-blue-800 mb-2 text-sm sm:text-base">在全体论文中的位次</h4>
-                      <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">
+                      <h4 className="font-semibold text-blue-800 mb-2">在全体论文中的位次</h4>
+                      <div className="text-2xl font-bold text-blue-600 mb-1">
                         第 {prediction.rankInAll ? prediction.rankInAll.toLocaleString() : '--'} 名
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="text-sm text-gray-600">
                         / 共 {prediction.totalPapers ? prediction.totalPapers.toLocaleString() : historicalStats.totalPapers.toLocaleString()} 篇投稿
                       </div>
                     </div>
                     <div className="bg-green-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-green-800 mb-2 text-sm sm:text-base">在接收论文中的位次</h4>
-                      <div className="text-xl sm:text-2xl font-bold text-green-600 mb-1">
+                      <h4 className="font-semibold text-green-800 mb-2">在接收论文中的位次</h4>
+                      <div className="text-2xl font-bold text-green-600 mb-1">
                         第 {prediction.rankInAccepted ? prediction.rankInAccepted.toLocaleString() : '--'} 名
                       </div>
-                      <div className="text-xs sm:text-sm text-gray-600">
+                      <div className="text-sm text-gray-600">
                         / 共 {prediction.acceptedPapers ? prediction.acceptedPapers.toLocaleString() : historicalStats.acceptedPapers.toLocaleString()} 篇接收
                       </div>
                     </div>
@@ -582,9 +526,9 @@ export default function UserInterface() {
               </>
             )}
 
-            <div className="bg-white rounded-lg p-4 sm:p-6 border shadow">
+            <div className="bg-white rounded-lg p-6 border shadow">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">{settings.conference || 'ICLR'}历史接受率</h3>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={neuripsData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
@@ -593,14 +537,14 @@ export default function UserInterface() {
                   <Line type="monotone" dataKey="acceptance" stroke="#8884d8" strokeWidth={3} dot={{ fill: '#8884d8', strokeWidth: 2, r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
-              <div className="mt-3 text-xs sm:text-sm text-gray-600 text-center">
+              <div className="mt-3 text-sm text-gray-600 text-center">
                 近年来{settings.conference || 'ICLR'}接受率约为 {(historicalStats.acceptanceRate * 100).toFixed(1)}%
               </div>
             </div>
           </div>
         </div>
 
-        <div className="text-center mt-6 sm:mt-8 py-4 border-t border-gray-200">
+        <div className="text-center mt-8 py-4 border-t border-gray-200">
           <p className="text-gray-600 text-sm">
             有问题？联系
             <button
