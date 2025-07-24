@@ -15,6 +15,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 修复3：防止移动端缩放问题 */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 .App {
@@ -29,6 +32,160 @@ nav a {
 
 nav a:hover {
   color: #93c5fd;
+}
+
+/* 修复3：移动端优化样式 */
+@media (max-width: 768px) {
+  /* 导航栏移动端优化 */
+  nav .flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  nav h1 {
+    text-align: center;
+    font-size: 1.25rem;
+  }
+
+  nav .space-x-4 {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  nav button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* 主容器移动端优化 */
+  .max-w-6xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* 网格布局移动端优化 */
+  .lg\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 表单元素移动端优化 */
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  /* 统计卡片移动端优化 */
+  .md\\:grid-cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .md\\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .md\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 按钮移动端优化 */
+  .sm\\:flex-row {
+    flex-direction: column !important;
+  }
+
+  /* 文字大小移动端优化 */
+  .text-4xl {
+    font-size: 2rem;
+  }
+
+  .text-6xl {
+    font-size: 3rem;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+
+  /* 间距移动端优化 */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+
+  .space-y-8 > * + * {
+    margin-top: 1.5rem;
+  }
+
+  /* 图表移动端优化 */
+  .recharts-wrapper {
+    width: 100% !important;
+    height: 200px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 超小屏幕优化 */
+  .p-8 {
+    padding: 1rem;
+  }
+
+  .p-6 {
+    padding: 0.75rem;
+  }
+
+  .p-4 {
+    padding: 0.5rem;
+  }
+
+  .text-4xl {
+    font-size: 1.75rem;
+  }
+
+  .text-6xl {
+    font-size: 2.5rem;
+  }
+
+  .mb-8 {
+    margin-bottom: 1.5rem;
+  }
+
+  .mb-6 {
+    margin-bottom: 1rem;
+  }
+
+  /* 支付二维码优化 */
+  .w-48.h-48 {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .w-40.h-40 {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 增大点击区域 */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  select {
+    min-height: 44px;
+  }
+
+  input {
+    min-height: 44px;
+  }
+}
+
+/* 横屏平板优化 */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .lg\\:grid-cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* 如果Tailwind不工作，备用样式 */
@@ -84,12 +241,37 @@ nav a:hover {
   border-radius: 8px;
 }
 
+@media (max-width: 768px) {
+  .fallback-container {
+    padding: 12px;
+  }
+
+  .fallback-card {
+    padding: 16px;
+  }
+
+  .fallback-title {
+    font-size: 1.5rem;
+  }
+
+  .fallback-section {
+    padding: 16px;
+  }
+
+  .fallback-input-group {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
 .fallback-input {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;
+  min-height: 44px;
 }
 
 .fallback-button {
@@ -103,6 +285,7 @@ nav a:hover {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .fallback-button:hover {
@@ -116,12 +299,19 @@ nav a:hover {
   font-size: 14px;
 }
 
+@media (max-width: 480px) {
+  .fallback-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 .fallback-stat-item {
   background: white;
   padding: 8px;
   border-radius: 6px;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .fallback-payment {
@@ -130,6 +320,12 @@ nav a:hover {
   border-radius: 8px;
   padding: 24px;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .fallback-payment {
+    padding: 16px;
+  }
 }
 
 .fallback-qr {
@@ -145,12 +341,26 @@ nav a:hover {
   font-size: 48px;
 }
 
+@media (max-width: 480px) {
+  .fallback-qr {
+    width: 128px;
+    height: 128px;
+    font-size: 32px;
+  }
+}
+
 .fallback-result {
   background: linear-gradient(to right, #dcfce7, #dbeafe);
   border: 2px solid #22c55e;
   border-radius: 12px;
   padding: 32px;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .fallback-result {
+    padding: 16px;
+  }
 }
 
 .fallback-percentage {
@@ -160,6 +370,12 @@ nav a:hover {
   margin: 16px 0;
 }
 
+@media (max-width: 480px) {
+  .fallback-percentage {
+    font-size: 2.5rem;
+  }
+}
+
 .fallback-contact {
   text-align: center;
   margin-top: 32px;
@@ -167,4 +383,54 @@ nav a:hover {
   border-top: 1px solid #e5e7eb;
   color: #6b7280;
   font-size: 14px;
+}
+
+/* 防止移动端页面缩放 */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* 移动端输入框优化 */
+input, select, textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* iOS Safari 优化 */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="number"],
+  select {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+}
+
+/* 滚动条优化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 加载动画优化 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

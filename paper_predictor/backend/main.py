@@ -25,13 +25,15 @@ os.makedirs("uploads/qr_codes", exist_ok=True)
 os.makedirs("data", exist_ok=True)
 os.makedirs("nips_history_data", exist_ok=True)  # 历史数据目录
 
-# 允许跨域访问
+# 修复1：更灵活的CORS配置 - 支持部署环境
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",                    # 本地开发
-        "https://products-silk-chi.vercel.app",     # 🔥 你的Vercel前端URL
-        "https://*.vercel.app",                     # 所有Vercel子域名
+        "http://localhost:3000",  # 本地开发
+        "http://127.0.0.1:3000",  # 本地开发
+        "https://products-silk-chi.vercel.app",  # 🔥 你的Vercel前端URL
+        "https://*.vercel.app",  # 所有Vercel子域名
+        "*"  # 临时允许所有域名，生产环境建议限制
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -106,8 +108,11 @@ def download_data_from_google_drive():
         else:
             print(f"✅ {file_path} 已存在，跳过下载")
 
+
 # 全局历史数据缓存
 historical_data = {}
+
+
 def load_historical_data():
     """加载历史评审数据"""
     global historical_data
@@ -268,7 +273,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
             final_probability = 0.25
         print(f"📐 默认线性插值: 均值{user_avg_score:.2f}, 概率: {final_probability:.3f}")
 
-    # 计算排名 - 基于历史数据中的均值比较
+    # 修复2：确保从正确的历史数据计算排名
     prev_year = str(int(year) - 1)  # 预测年份的前一年作为参考数据
 
     if prev_year in historical_data and historical_data[prev_year]["all_papers"]:
@@ -424,7 +429,8 @@ async def root():
         "features": {
             "ml_models": False,
             "prediction_method": "rule_based",
-            "prediction_stats": prediction_stats
+            "prediction_stats": prediction_stats,
+            "historical_data_loaded": list(historical_data.keys())  # 修复：返回已加载的数据年份
         }
     }
 
@@ -592,7 +598,7 @@ async def predict(request: PredictionRequest):
         prediction_stats["total_predictions"] += 1
         prediction_stats["avg_prediction_time"] = (
                                                           prediction_stats["avg_prediction_time"] * (
-                                                              prediction_stats["total_predictions"] - 1) +
+                                                          prediction_stats["total_predictions"] - 1) +
                                                           prediction_time
                                                   ) / prediction_stats["total_predictions"]
 
@@ -658,29 +664,50 @@ async def get_stats():
             "today_revenue": today_revenue,
             "success_rate": successful_payments / total_orders if total_orders > 0 else 0,
             "prediction_stats": prediction_stats,
-            "prediction_method": "rule_based_only"
+            "prediction_method": "rule_based_only",
+            "historical_data": {  # 修复：添加历史数据信息
+                year: {
+                    "total_papers": data["total_count"],
+                    "accepted_papers": data["accepted_count"],
+                    "acceptance_rate": data["acceptance_rate"]
+                }
+                for year, data in historical_data.items()
+            }
         }
     except Exception as e:
         return {"error": f"获取统计失败: {str(e)}"}
 
 
-# if __name__ == "__main__":
-#     print("🚀 启动简化版论文接受率预测API...")
-#     print("✨ 特性:")
-#     print("  - 基于规则的预测算法")
-#     print("  - 详细的调试日志")
-#     print("  - 简化的代码结构")
-#     print("")
-#     print("🌐 访问地址:")
-#     print("  用户界面: http://127.0.0.1:8000")
-#     print("  API文档: http://127.0.0.1:8000/docs")
-#     print("  数据状态: http://127.0.0.1:8000/data-status")
-#     print("  系统统计: http://127.0.0.1:8000/stats")
-#
-#     uvicorn.run(app, host="127.0.0.1", port=8000)
+# 修复3：添加健康检查端点
+@app.get("/health")
+async def health_check():
+    """健康检查端点"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "2.0.0",
+        "data_loaded": len(historical_data) > 0,
+        "historical_years": list(historical_data.keys())
+    }
 
 
 if __name__ == "__main__":
     import os
+
     port = int(os.environ.get("PORT", 8000))
+
+    print("🚀 启动论文接受率预测API...")
+    print("✨ 特性:")
+    print("  - 基于规则的预测算法")
+    print("  - 历史数据支持排名计算")
+    print("  - 详细的调试日志")
+    print("  - 修复了CORS和移动端适配")
+    print("")
+    print("🌐 访问地址:")
+    print(f"  API服务: http://0.0.0.0:{port}")
+    print(f"  API文档: http://0.0.0.0:{port}/docs")
+    print(f"  数据状态: http://0.0.0.0:{port}/data-status")
+    print(f"  健康检查: http://0.0.0.0:{port}/health")
+    print(f"  系统统计: http://0.0.0.0:{port}/stats")
+
     uvicorn.run(app, host="0.0.0.0", port=port)
