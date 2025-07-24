@@ -69,9 +69,8 @@ prediction_stats = {
 }
 
 # Google Drive下载链接
-ICLR_2024_URL = "https://drive.google.com/uc?export=download&id=1CVsi7YU6rNcrhNqPMrGOWsxqHpsmysH4"
-ICLR_2025_URL = "https://drive.google.com/uc?export=download&id=1NXYIG-UIQUnur24fe36fqaobl722pCr_"
-
+ICLR_2024_URL = "https://drive.google.com/uc?export=download&id=1CVsi7YU6rNcrhNqPMrGOWsxqHpsmysH4&confirm=t"
+ICLR_2025_URL = "https://drive.google.com/uc?export=download&id=1NXYIG-UIQUnur24fe36fqaobl722pCr_&confirm=t"
 # 本地文件路径
 ICLR_2024_FILE = "nips_history_data/ICLR_2024_formatted.jsonl"
 ICLR_2025_FILE = "nips_history_data/ICLR_2025_formatted.jsonl"
