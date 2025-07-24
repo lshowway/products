@@ -247,7 +247,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
     # target_scores = t
     user_avg_score = np.mean(target_scores)
     positive_scores = sum(1 for score in target_scores if score >= 4)
-    negative_scores = sum(1 for score in target_scores if score <= 3)
+    negative_scores = sum(1 for score in target_scores if score < 3)
 
     print(f"📊 用户论文统计 - 平均分: {user_avg_score:.2f}, 正分数: {positive_scores}, 负分数: {negative_scores}")
 
@@ -255,12 +255,12 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
     final_probability = 0.5  # 默认概率
 
     # 规则1: 均值 > 6
-    if user_avg_score > 4:
+    if user_avg_score > 3.7:
         final_probability = random.uniform(0.90, 0.92)
         print(f"✅ 规则1命中: 均值{user_avg_score:.2f} > 6, 概率: {final_probability:.3f}")
     # 规则2: 均值 <= 4
-    elif user_avg_score <= 4:
-        final_probability = random.uniform(0.01, 0.2)
+    elif user_avg_score <= 3:
+        final_probability = random.uniform(0.03, 0.5)
         print(f"❌ 规则2命中: 均值{user_avg_score:.2f} <= 4, 概率: {final_probability:.3f}")
     # 规则3: 全是正分（>=5）
     elif negative_scores == 0:
@@ -287,7 +287,7 @@ def calculate_paper_ranking_basic(target_scores, target_confidences, year="2025"
         final_probability = random.uniform(0.60, 0.75)
         print(f"⚠️  规则8命中: 2个负分, 概率: {final_probability:.3f}")
     # 规则9: 分数只有5和6
-    elif all(score in [5, 6] for score in target_scores):
+    elif all(score in [3, 4] for score in target_scores):
         final_probability = random.uniform(0.75, 0.85)
         print(f"✅ 规则9命中: 全是5,6分, 概率: {final_probability:.3f}")
     # 默认情况：基于均值线性插值
