@@ -1,0 +1,27 @@
+{
+  "price": 0.2,
+  "qr_code_url": "/uploads/qr_codes/qr_1753324209.png",
+  "contact_phone": "13109973548",
+  "score_options": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "confidence_options": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "conference": "NeurIPS",
+  "year": "2025",
+  "model": "ensemble_v1"
+}

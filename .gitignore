@@ -1,0 +1,46 @@
+/.venv/
+/paper_predictor/frontend/node_modules
+/paper_predictor/backend/nips_history_data/ICLR_2024_formatted.jsonl
+/paper_predictor/backend/nips_history_data/ICLR_2025_formatted.jsonl
+__pycache__/
+*.pyc
+# Python
+*.py[cod]
+*.so
+.venv/
+venv/
+env/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+/backend/data/
+#/backend/uploads/
+/frontend/build/
+/frontend/dist/
+
+# 大数据文件
+*.jsonl
+*.csv
+*.xlsx
+nips_history_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+/paper_predictor/simple_deploy_script.sh
+/paper_predictor/setup_script.sh
+/usage_guide.md
+/paper_predictor/frontend/README.md
+/paper_predictor/complete_readme.txt
+/paper_predictor/README.md

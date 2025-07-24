@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 确保基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* 导航栏样式 */
+nav a {
+  text-decoration: none;
+  color: inherit;
+}
+
+nav a:hover {
+  color: #93c5fd;
+}
+
+/* 如果Tailwind不工作，备用样式 */
+.fallback-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+  min-height: 100vh;
+}
+
+.fallback-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+}
+
+.fallback-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.fallback-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .fallback-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fallback-section {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.fallback-input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.fallback-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.fallback-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: linear-gradient(to right, #7c3aed, #4338ca);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fallback-button:hover {
+  transform: scale(1.02);
+}
+
+.fallback-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.fallback-stat-item {
+  background: white;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fallback-payment {
+  background: #f0fdf4;
+  border: 2px solid #22c55e;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.fallback-qr {
+  width: 192px;
+  height: 192px;
+  background: #e5e7eb;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.fallback-result {
+  background: linear-gradient(to right, #dcfce7, #dbeafe);
+  border: 2px solid #22c55e;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+}
+
+.fallback-percentage {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #22c55e;
+  margin: 16px 0;
+}
+
+.fallback-contact {
+  text-align: center;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+}
