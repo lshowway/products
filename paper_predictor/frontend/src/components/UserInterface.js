@@ -115,38 +115,6 @@ export default function UserInterface() {
     });
   };
 
-  // 支付状态检查
-  const checkPaymentStatus = async (orderId) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/check-payment/${orderId}`);
-      const data = await response.json();
-      return data.status;
-    } catch (error) {
-      return 'failed';
-    }
-  };
-
-  // 创建支付订单
-  const createPaymentOrder = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/create-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: settings.price,
-          description: `${settings.conference || 'ICLR'}论文接受率预测`
-        })
-      });
-      const data = await response.json();
-      return data.orderId;
-    } catch (error) {
-      console.error('创建支付订单失败:', error);
-      return null;
-    }
-  };
-
   const calculateStats = () => {
     const scoreValues = Object.values(scores).filter(s => s).map(Number);
 
@@ -265,46 +233,18 @@ export default function UserInterface() {
     setIsLoading(true);
     setPaymentStatus('pending');
 
-    // 创建支付订单
-    const orderId = await createPaymentOrder();
-    if (!orderId) {
-      alert('创建支付订单失败，请稍后重试');
-      setIsLoading(false);
-      return;
+    // 模拟支付处理时间
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // 直接显示预测结果
+    setPaymentStatus('success');
+    setShowPayment(false);
+    setIsLoading(false);
+
+    const result = await calculatePrediction();
+    if (result) {
+      setPrediction(result);
     }
-
-    alert(`支付订单已创建：${orderId}\n请扫描二维码完成支付`);
-
-    // 轮询检查支付状态
-    const checkPayment = async () => {
-      for (let i = 0; i < 30; i++) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        const status = await checkPaymentStatus(orderId);
-
-        if (status === 'success') {
-          setPaymentStatus('success');
-          setShowPayment(false);
-          setIsLoading(false);
-
-          const result = await calculatePrediction();
-          if (result) {
-            setPrediction(result);
-          }
-          return;
-        } else if (status === 'failed') {
-          setPaymentStatus('failed');
-          setIsLoading(false);
-          alert('支付失败，请重试');
-          return;
-        }
-      }
-
-      setPaymentStatus('failed');
-      setIsLoading(false);
-      alert('支付超时，请重试');
-    };
-
-    checkPayment();
   };
 
   const stats = calculateStats();
@@ -322,6 +262,10 @@ export default function UserInterface() {
   return (
     <div className="max-w-5xl mx-auto p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
       <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{settings.conference || 'NeurIPS'} 论文接受率预测器</h1>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
