@@ -130,14 +130,14 @@ export default function AdminInterface() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          price: newSettings.price,
-          contact_phone: newSettings.contactPhone,
-          score_options: newSettings.scoreOptions,
-          confidence_options: newSettings.confidenceOptions,
-          conference: newSettings.conference,
-          year: newSettings.year,
-          model: newSettings.model,
-          payment_wait_time: newSettings.paymentWaitTime
+          price: Number(newSettings.price),
+          contact_phone: String(newSettings.contactPhone),
+          score_options: String(newSettings.scoreOptions).trim(),
+          confidence_options: String(newSettings.confidenceOptions).trim(),
+          conference: String(newSettings.conference || 'ICLR'),
+          year: String(newSettings.year || '2024'),
+          model: String(newSettings.model || 'ensemble_v1'),
+          payment_wait_time: Number(newSettings.paymentWaitTime) || 60
         })
       });
 

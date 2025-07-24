@@ -450,9 +450,8 @@ async def update_settings(new_settings: SettingsUpdate):
 
     try:
         # 解析评分选项
-        score_options = [int(x.strip()) for x in new_settings.score_options.split(',') if x.strip()]
-        confidence_options = [int(x.strip()) for x in new_settings.confidence_options.split(',') if x.strip()]
-
+        score_options = [float(x.strip()) for x in new_settings.score_options.split(',') if x.strip()]
+        confidence_options = [float(x.strip()) for x in new_settings.confidence_options.split(',') if x.strip()]
         # 更新设置
         current_settings.update({
             "price": new_settings.price,
