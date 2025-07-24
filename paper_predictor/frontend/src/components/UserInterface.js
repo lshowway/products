@@ -279,7 +279,7 @@ export default function UserInterface() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{settings.conference || 'NeurIPS'} 论文接受率预测器</h1>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
             <p className="text-gray-700 mb-2">
-              🎯基于历史数据分析，预测论文接收可能性；可能性大于95%不出意外一定接收；可能性小于45%不出意外被拒绝；可能性80%~89%非常依靠rebuttal以及AC
+              🎯基于历史数据分析，预测论文接收可能性，结果仅供参考；可能性大于95%不出意外一定接收；可能性小于45%不出意外被拒绝；可能性80%~89%非常依靠rebuttal以及AC
             </p>
             {/*<p className="text-sm text-gray-600">*/}
             {/*  💡 只需输入评审评分，即可获得专业的接受率分析和排名预测*/}
