@@ -12,15 +12,29 @@ function App() {
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">论文接受率预测器</h1>
           <div className="space-x-4">
+            {/*<button*/}
+            {/*  onClick={() => setCurrentPage('user')}*/}
+            {/*  className={`px-4 py-2 rounded ${currentPage === 'user' ? 'bg-blue-600' : 'bg-gray-600'}`}*/}
+            {/*>*/}
+            {/*  用户界面*/}
+            {/*</button>*/}
             <button
-              onClick={() => setCurrentPage('user')}
-              className={`px-4 py-2 rounded ${currentPage === 'user' ? 'bg-blue-600' : 'bg-gray-600'}`}
+                onClick={() => setCurrentPage('user')}
+                className="opacity-0 text-xs px-1 py-1"
+                style={{fontSize: '1px', color: 'transparent'}}
             >
               用户界面
             </button>
+            {/*<button*/}
+            {/*  onClick={() => setCurrentPage('admin')}*/}
+            {/*  className={`px-4 py-2 rounded ${currentPage === 'admin' ? 'bg-blue-600' : 'bg-gray-600'}`}*/}
+            {/*>*/}
+            {/*  paper*/}
+            {/*</button>*/}
             <button
-              onClick={() => setCurrentPage('admin')}
-              className={`px-4 py-2 rounded ${currentPage === 'admin' ? 'bg-blue-600' : 'bg-gray-600'}`}
+                onClick={() => setCurrentPage('admin')}
+                className="opacity-0 text-xs px-1 py-1"
+                style={{fontSize: '1px', color: 'transparent'}}
             >
               管理后台
             </button>
@@ -29,7 +43,7 @@ function App() {
       </nav>
 
       {/* 页面内容 */}
-      {currentPage === 'user' ? <UserInterface /> : <AdminInterface />}
+      {currentPage === 'user' ? <UserInterface/> : <AdminInterface/>}
     </div>
   );
 }
