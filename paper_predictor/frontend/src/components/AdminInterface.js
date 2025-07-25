@@ -11,7 +11,7 @@ export default function AdminInterface() {
     model: 'ensemble_v1',
     contactPhone: '13109973548',
     paymentWaitTime: 60,
-    adminPassword: 'admin123'
+    adminPassword: '123admin123'
   });
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
